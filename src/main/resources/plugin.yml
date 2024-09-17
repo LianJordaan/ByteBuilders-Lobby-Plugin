@@ -1,0 +1,4 @@
+name: ByteBuildersLobbyPlugin
+version: '1.0'
+main: io.github.lianjordaan.byteBuildersLobbyPlugin.ByteBuildersLobbyPlugin
+api-version: '1.21'
