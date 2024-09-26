@@ -85,7 +85,7 @@ public class WebSocketClientHandler extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        logger.info("WebSocket connection closed: " + reason);
+        logger.info("WebSocket connection closed: {}", reason);
         if (reason.contains("refused")) {
             attempt++;
             if (attempt > maxAttempts) {
@@ -95,7 +95,7 @@ public class WebSocketClientHandler extends WebSocketClient {
                     Bukkit.getServer().shutdown();
                 }, delay, TimeUnit.SECONDS);
             } else {
-                logger.error("Failed to connect to backend database, attempting again in " + delay + " seconds");
+                logger.error("Failed to connect to backend database, attempting again in {} seconds", delay);
                 scheduleReconnect(delay, attempt);
             }
         }
