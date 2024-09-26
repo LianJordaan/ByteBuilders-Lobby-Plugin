@@ -37,6 +37,13 @@ public class InventoryClick implements Listener {
                         MenuUtils.openPlotsMenu((Player) event.getWhoClicked(), pageValue);
                     }
                 }
+            } else if (dataContainer.has(openMenuKey, PersistentDataType.STRING)) {
+
+                String openMenuValue = dataContainer.get(openMenuKey, PersistentDataType.STRING);
+
+                if ("claim-new-plot".equals(openMenuValue)) {
+                    MenuUtils.openClaimNewPlotMenu((Player) event.getWhoClicked());
+                }
             }
         }
 
@@ -76,8 +83,7 @@ public class InventoryClick implements Listener {
             // Handle off-hand swap (using the F key)
             if (event.getClick() == ClickType.SWAP_OFFHAND) {
                 ItemStack offHandItem = event.getWhoClicked().getInventory().getItemInOffHand();
-                if (offHandItem != null && offHandItem.hasItemMeta() &&
-                        offHandItem.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
+                if (offHandItem.hasItemMeta() && offHandItem.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
                     event.setCancelled(true);
                     return;
                 }
