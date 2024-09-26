@@ -1,8 +1,10 @@
 package io.github.lianjordaan.byteBuildersLobbyPlugin.events;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.lianjordaan.byteBuildersLobbyPlugin.ByteBuildersLobbyPlugin;
+import io.github.lianjordaan.byteBuildersLobbyPlugin.utils.LuckpermsUtils;
 import io.github.lianjordaan.byteBuildersLobbyPlugin.utils.WebSocketUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Server;
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -117,7 +121,18 @@ public class AsyncChat implements Listener {
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setDoOutput(true);
 
-                String jsonInputString = String.format("{\"name\": \"%s\", \"description\": \"%s\", \"size\": %s, \"ownerUuid\": \"%s\", \"rank\": \"%s\"}", "<white>" + player.getName() + "'s Plot", "<white>Default description of " + player.getName() + "'s plot", size, player.getUniqueId(), "default");
+                // Create a Map to hold the JSON data
+                Map<String, Object> jsonMap = new HashMap<>();
+                jsonMap.put("name", "<white>" + player.getName() + "'s Plot");
+                jsonMap.put("description", "<white>Default description of " + player.getName() + "'s plot");
+                jsonMap.put("size", size);
+                jsonMap.put("ownerUuid", player.getUniqueId().toString());
+                jsonMap.put("rank", LuckpermsUtils.getHighestRank(player));
+
+                // Convert the Map to a JSON string using Gson
+                Gson gson = new Gson();
+                String jsonInputString = gson.toJson(jsonMap);
+
                 connection.getOutputStream().write(jsonInputString.getBytes(StandardCharsets.UTF_8));
                 int responseCode = connection.getResponseCode();
 
