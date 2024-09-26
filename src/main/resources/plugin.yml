@@ -2,3 +2,16 @@ name: ByteBuildersLobbyPlugin
 version: '1.0'
 main: io.github.lianjordaan.byteBuildersLobbyPlugin.ByteBuildersLobbyPlugin
 api-version: '1.21'
+commands:
+  spawn:
+    description: Teleports you to your spawn point
+    usage: /spawn
+  setspawn:
+    description: Sets your spawn point
+    usage: /setspawn
+    permission-message: "&cYou don't have permission to use this command!"
+    permission: spawn.setspawn
+permissions:
+  spawn.setspawn:
+    description: Sets your spawn point
+    default: op
