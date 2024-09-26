@@ -1,32 +1,18 @@
 package io.github.lianjordaan.byteBuildersLobbyPlugin;
 
 import com.google.common.eventbus.Subscribe;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import io.github.lianjordaan.byteBuildersLobbyPlugin.utils.WebSocketUtils;
-import net.kyori.adventure.text.Component;
+import io.github.lianjordaan.byteBuildersLobbyPlugin.commands.SetSpawnCommand;
+import io.github.lianjordaan.byteBuildersLobbyPlugin.commands.SpawnCommand;
+import io.github.lianjordaan.byteBuildersLobbyPlugin.events.*;
 import org.bukkit.Server;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.java_websocket.client.WebSocketClient;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.URI;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Scanner;
-import java.util.concurrent.CompletableFuture;
 
 public final class ByteBuildersLobbyPlugin extends JavaPlugin implements Listener {
 
@@ -36,9 +22,18 @@ public final class ByteBuildersLobbyPlugin extends JavaPlugin implements Listene
 
     @Subscribe
     public void onEnable() {
-        //register the onplayerChat event
-        getServer().getPluginManager().registerEvents(this, this);
-        logger.info("ByteBuilders Proxy Plugin initialized!");
+        //register the events
+        logger.info("Registering events...");
+        getServer().getPluginManager().registerEvents(new AsyncChat(), this);
+        getServer().getPluginManager().registerEvents(new InventoryClick(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
+        getServer().getPluginManager().registerEvents(new SwapHands(), this);
+        getServer().getPluginManager().registerEvents(new DropItem(), this);
+        getServer().getPluginManager().registerEvents(new RightClickItem(), this);
+        logger.info("Registering commands...");
+        this.getCommand("spawn").setExecutor(new SpawnCommand());
+        this.getCommand("setspawn").setExecutor(new SetSpawnCommand());
+        logger.info("ByteBuilders Lobby Plugin initialized!");
 
         try {
             Properties env = EnvLoader.loadEnv();
