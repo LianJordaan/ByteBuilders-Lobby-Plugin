@@ -107,6 +107,25 @@ public class ItemManager {
         return preventDropAndMove(item);
     }
 
+    //create the previous page item
+    public static ItemStack createBackPageItem(Integer pageNumber, String pageName) {
+        ItemStack item = new ItemStack(Material.ARROW); // Use the desired material
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><red>Back"));
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, pageName);
+        if (pageNumber != null) {
+            meta.getPersistentDataContainer().set(NamespacedKey.fromString("page", plugin), PersistentDataType.INTEGER, pageNumber);
+        }
+        item.setItemMeta(meta);
+
+        return preventDropAndMove(item);
+    }
+
+
     public static ItemStack preventDropAndMove(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
 
