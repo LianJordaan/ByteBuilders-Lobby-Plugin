@@ -1,12 +1,13 @@
 package io.github.lianjordaan.byteBuildersLobbyPlugin.utils;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.context.ContextSet;
+import net.luckperms.api.query.QueryMode;
+import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.profile.PlayerTextures;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,10 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class MenuUtils {
@@ -164,5 +163,54 @@ public class MenuUtils {
 
     public static void openClaimNewPlotMenu(Player player) {
         Inventory inventory = Bukkit.createInventory(null, 45, MiniMessage.miniMessage().deserialize("<!i><green>Claim New Plot"));
+
+        //fill the inventory with border items
+        for (int i = 0; i < inventory.getSize(); i++) {
+            inventory.setItem(i, ItemManager.preventDropAndMove(ItemManager.createPlotMenuBorderItem()));
+        }
+        //loop a certain size (7*3) times.
+        for (int i = 0; i < 7*3; i++) {
+            int slot = 10 + i + (2 * Math.floorDiv(i, 7));
+            inventory.setItem(slot, new ItemStack(Material.AIR));
+        }
+        ItemStack backItem = ItemManager.createBackPageItem(1, "my-plots");
+        inventory.setItem(inventory.getSize() - 9, ItemManager.preventDropAndMove(backItem));
+
+        player.openInventory(inventory);
+
+        Map<String, Object> jsonMap = new HashMap<>();
+        jsonMap.put("uuid", player.getUniqueId().toString());
+        jsonMap.put("rank", LuckpermsUtils.getHighestRank(player));
+
+        // Convert the Map to a JSON string using Gson
+        String body = new Gson().toJson(jsonMap);
+
+        CompletableFuture<String> future = WebRequestUtils.makeWebRequest("http://192.168.0.125:3000/player/get-limits", body, "json");
+
+        // Use the output in the main thread once it's available
+        future.thenAccept(result -> {
+            int index = 0;
+            JsonObject jsonObject = JsonParser.parseString(result).getAsJsonObject();
+
+            ArrayList<Material> materialList = new ArrayList<>(Arrays.asList(Material.POLISHED_ANDESITE, Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.EMERALD_BLOCK, Material.NETHERITE_BLOCK, Material.AMETHYST_BLOCK));
+
+            for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                Material material = materialList.get(index);
+                Integer maxPlots = entry.getValue().getAsJsonObject().get("max").getAsInt();
+                Integer usedPlots = entry.getValue().getAsJsonObject().get("used").getAsInt();
+                String plotSize = entry.getValue().getAsJsonObject().get("size").getAsString();
+                ItemStack item = ItemManager.createPlotItem(entry.getKey(), maxPlots, usedPlots, material, plotSize);
+
+                int slot = 11 + 2 * index + 12 * Math.floorDiv(index, 3);
+
+                player.getOpenInventory().setItem(slot, ItemManager.preventDropAndMove(item));
+                index++;
+            }
+        }).exceptionally(ex -> {
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<!i><red>Error: Failed to fetch plots. Please try again later or contact the server administrator."));
+            player.closeInventory();
+            Bukkit.getServer().getLogger().info("Error: " + ex);
+            return null;
+        });
     }
 }
