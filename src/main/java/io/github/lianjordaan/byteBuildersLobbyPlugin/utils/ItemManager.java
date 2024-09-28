@@ -131,12 +131,12 @@ public class ItemManager {
     }
 
     //create plot item for create new plot menu
-    public static ItemStack createPlotItem(String plotType, Integer maxPlots, Integer usedPlots, Material material, String plotSize) {
+    public static ItemStack createPlotItem(String plotType, Integer maxPlots, Integer usedPlots, Material material, String plotSizeName, String plotSize) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(MiniMessage.miniMessage().deserialize("<!i>" + ColorUtils.getPlotColor(plotType) + plotType + " Plot"));
         List<Component> lore = new ArrayList<>();
-        lore.add(MiniMessage.miniMessage().deserialize("<!i><#808080>Size: " + plotSize));
+        lore.add(MiniMessage.miniMessage().deserialize("<!i><#808080>Size: " + plotSizeName));
         lore.add(Component.text(""));
         if (maxPlots == 0) {
             lore.add(MiniMessage.miniMessage().deserialize("<!i><gray>You do not own any plots of this type."));
@@ -158,7 +158,7 @@ public class ItemManager {
         meta.setMaxStackSize(stackSize);
         meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
         meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
-        meta.getPersistentDataContainer().set(NamespacedKey.fromString("create-plot", plugin), PersistentDataType.STRING, plotType);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("create-plot", plugin), PersistentDataType.STRING, plotSize);
         item.setItemMeta(meta);
         item.setAmount(stackSize);
 
