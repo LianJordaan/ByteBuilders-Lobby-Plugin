@@ -198,8 +198,9 @@ public class MenuUtils {
                 Material material = materialList.get(index);
                 Integer maxPlots = entry.getValue().getAsJsonObject().get("max").getAsInt();
                 Integer usedPlots = entry.getValue().getAsJsonObject().get("used").getAsInt();
+                String plotSizeName = entry.getValue().getAsJsonObject().get("sizeName").getAsString();
                 String plotSize = entry.getValue().getAsJsonObject().get("size").getAsString();
-                ItemStack item = ItemManager.createPlotItem(entry.getKey(), maxPlots, usedPlots, material, plotSize);
+                ItemStack item = ItemManager.createPlotItem(entry.getKey(), maxPlots, usedPlots, material, plotSizeName, plotSize);
 
                 int slot = 11 + 2 * index + 12 * Math.floorDiv(index, 3);
 
