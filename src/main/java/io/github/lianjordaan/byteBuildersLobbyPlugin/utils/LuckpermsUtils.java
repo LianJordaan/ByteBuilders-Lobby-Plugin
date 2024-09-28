@@ -27,6 +27,7 @@ public class LuckpermsUtils {
                     .toList();
 
             // Check for ranks in order of priority
+            if (lowerCaseRanks.contains("media")) return "media";
             if (lowerCaseRanks.contains("royal")) return "royal";
             if (lowerCaseRanks.contains("emperor")) return "emperor";
             if (lowerCaseRanks.contains("mythic")) return "mythic";
