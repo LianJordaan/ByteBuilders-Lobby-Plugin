@@ -2,6 +2,7 @@ package io.github.lianjordaan.byteBuildersLobbyPlugin.events;
 
 import io.github.lianjordaan.byteBuildersLobbyPlugin.ByteBuildersLobbyPlugin;
 import io.github.lianjordaan.byteBuildersLobbyPlugin.utils.MenuUtils;
+import io.github.lianjordaan.byteBuildersLobbyPlugin.utils.PlotUtils;
 import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -20,6 +21,7 @@ public class InventoryClick implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         NamespacedKey pageKey = new NamespacedKey(ByteBuildersLobbyPlugin.getPlugin(ByteBuildersLobbyPlugin.class), "page");
         NamespacedKey openMenuKey = new NamespacedKey(ByteBuildersLobbyPlugin.getPlugin(ByteBuildersLobbyPlugin.class), "open-menu");
+        NamespacedKey claimPlotKey = new NamespacedKey(ByteBuildersLobbyPlugin.getPlugin(ByteBuildersLobbyPlugin.class), "create-plot");
 
         if (event.getCurrentItem() != null && event.getCurrentItem().hasItemMeta()) {
             ItemMeta meta = event.getCurrentItem().getItemMeta();
@@ -43,6 +45,11 @@ public class InventoryClick implements Listener {
 
                 if ("claim-new-plot".equals(openMenuValue)) {
                     MenuUtils.openClaimNewPlotMenu((Player) event.getWhoClicked());
+                }
+            } else {
+                if (dataContainer.has(claimPlotKey, PersistentDataType.STRING)) {
+                    String claimPlotValue = dataContainer.get(claimPlotKey, PersistentDataType.STRING);
+                    PlotUtils.createPlot((Player) event.getWhoClicked(), claimPlotValue);
                 }
             }
         }
