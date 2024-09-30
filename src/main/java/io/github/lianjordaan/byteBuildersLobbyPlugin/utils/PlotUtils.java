@@ -40,7 +40,7 @@ public class PlotUtils {
                 // Create a Map to hold the JSON data
                 Map<String, Object> jsonMap = new HashMap<>();
                 jsonMap.put("name", "<white>" + player.getName() + "'s Plot");
-                jsonMap.put("description", "<white>Default description of " + player.getName() + "'s plot");
+                jsonMap.put("description", "<!i><white>No description.");
                 jsonMap.put("size", size);
                 jsonMap.put("ownerUuid", player.getUniqueId().toString());
                 jsonMap.put("rank", LuckpermsUtils.getHighestRank(player));
