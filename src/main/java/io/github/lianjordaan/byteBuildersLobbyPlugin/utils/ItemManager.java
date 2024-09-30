@@ -143,7 +143,7 @@ public class ItemManager {
             lore.add(Component.text(""));
             lore.add(MiniMessage.miniMessage().deserialize("<!i><gold>Get your first " + plotType + " Plot in the store! (/buy)"));
         } else if (usedPlots >= maxPlots) {
-            lore.add(MiniMessage.miniMessage().deserialize("<!i><gray>You have used <red>" + usedPlots + "/" + maxPlots + " of your " + plotType + " Plots."));
+            lore.add(MiniMessage.miniMessage().deserialize("<!i><gray>You have used <red>" + usedPlots + "/" + maxPlots + "<gray> of your " + plotType + " Plots."));
             lore.add(Component.text(""));
             lore.add(MiniMessage.miniMessage().deserialize("<!i><gold>Get more " + plotType + " Plots in the store! (/buy)"));
         } else {
