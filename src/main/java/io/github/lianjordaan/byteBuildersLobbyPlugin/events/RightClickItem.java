@@ -28,6 +28,7 @@ public class RightClickItem implements Listener {
         NamespacedKey key = new NamespacedKey(plugin, "open-menu");
         String menyToOpen = event.getItem().getItemMeta().getPersistentDataContainer().getOrDefault(key, PersistentDataType.STRING, "");
         if (menyToOpen.equals("my-plots")) {
+            event.setCancelled(true);
             MenuUtils.openPlotsMenu(event.getPlayer(), 1);
         }
     }
