@@ -1,7 +1,6 @@
 package io.github.lianjordaan.byteBuildersLobbyPlugin.commands;
 
 import io.github.lianjordaan.byteBuildersLobbyPlugin.utils.ConfigUtils;
-import io.github.lianjordaan.byteBuildersLobbyPlugin.utils.SpawnUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
