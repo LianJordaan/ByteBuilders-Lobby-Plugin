@@ -46,24 +46,16 @@ public class ConfigUtils {
     }
 
     // Retrieves the spawn point for a specific world
-    public Location getSpawnPoint(String worldName) {
-        if (config.contains("worlds." + worldName + ".spawn")) {
-            Location location = config.getLocation("worlds." + worldName + ".spawn");
-
-            World world = Bukkit.getWorld(worldName);
-            if (world != null) {
-                return location;
-            }
+    public Location getSpawnPoint() {
+        if (config.contains("spawn")) {
+            return config.getLocation("spawn");
         }
         return null; // Return null if no spawn point exists
     }
 
     // Saves a spawn point for a specific world
     public static void setSpawnPoint(Location location) {
-        String worldName = location.getWorld().getName();
-
-        config.set("worlds." + worldName + ".spawn", location);
-
+        config.set("spawn", location);
         saveConfig(); // Save changes to the file
     }
 }

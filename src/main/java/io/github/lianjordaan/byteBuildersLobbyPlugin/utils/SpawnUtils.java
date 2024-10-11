@@ -19,7 +19,7 @@ public class SpawnUtils {
     public static void spawnPlayer(Player player) {
         ConfigUtils configUtils = new ConfigUtils(plugin);
 
-        Location spawnPoint = configUtils.getSpawnPoint(player.getWorld().getName());
+        Location spawnPoint = configUtils.getSpawnPoint();
         if (spawnPoint != null) {
             player.teleport(spawnPoint);
         } else {
