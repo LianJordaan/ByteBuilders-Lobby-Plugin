@@ -90,4 +90,31 @@ public class PlotUtils {
             }
         });
     }
+
+
+    public static CompletableFuture<Boolean> isWhitelisted(Integer plotID) {
+        CompletableFuture<String> future = WebRequestUtils.makeWebRequest("http://192.168.0.125:3000/get-all-plots", null, "");
+
+        // Create a new future to return the result
+        return future.thenApply(result -> {
+            JsonArray plots = JsonParser.parseString(result).getAsJsonArray();
+
+            // Loop through the array to find the plot with the given ID
+            for (int i = 0; i < plots.size(); i++) {
+                JsonObject plot = plots.get(i).getAsJsonObject();
+                int id = plot.get("_id").getAsInt();
+
+                if (id == plotID) {
+                    return plot.get("whitelisted").getAsBoolean();
+                }
+            }
+
+            // If the plot is not found or not whitelisted, return false
+            return false;
+        }).exceptionally(ex -> {
+            Bukkit.getServer().getLogger().info("Error: " + ex);
+            return false;
+        });
+    }
+
 }
