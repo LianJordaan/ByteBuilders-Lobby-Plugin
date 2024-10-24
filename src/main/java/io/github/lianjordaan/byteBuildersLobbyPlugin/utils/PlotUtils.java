@@ -1,15 +1,22 @@
 package io.github.lianjordaan.byteBuildersLobbyPlugin.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.google.gson.*;
 import io.github.lianjordaan.byteBuildersLobbyPlugin.ByteBuildersLobbyPlugin;
 import io.github.lianjordaan.byteBuildersLobbyPlugin.PluginManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.profile.PlayerTextures;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -18,9 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class PlotUtils {
@@ -117,4 +122,28 @@ public class PlotUtils {
         });
     }
 
+    public static CompletableFuture<JsonObject> getPlotObject(Integer plotID) {
+        CompletableFuture<String> future = WebRequestUtils.makeWebRequest("http://192.168.0.125:3000/get-all-plots", null, "");
+
+        // Create a new future to return the result
+        return future.thenApply(result -> {
+            JsonArray plots = JsonParser.parseString(result).getAsJsonArray();
+
+            // Loop through the array to find the plot with the given ID
+            for (int i = 0; i < plots.size(); i++) {
+                JsonObject plot = plots.get(i).getAsJsonObject();
+                int id = plot.get("_id").getAsInt();
+
+                if (id == plotID) {
+                    return plot; // Return the plot JsonObject
+                }
+            }
+
+            // If the plot is not found, return null or throw an exception based on your needs
+            return null; // You may choose to throw an exception instead
+        }).exceptionally(ex -> {
+            Bukkit.getServer().getLogger().info("Error: " + ex);
+            return null; // Return null on error or handle accordingly
+        });
+    }
 }
