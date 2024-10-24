@@ -2,6 +2,7 @@ package io.github.lianjordaan.byteBuildersLobbyPlugin.utils;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.gson.*;
+import io.github.lianjordaan.byteBuildersLobbyPlugin.ByteBuildersLobbyPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.LuckPerms;
@@ -10,16 +11,16 @@ import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.profile.PlayerTextures;
 import org.json.simple.JSONArray;
@@ -33,6 +34,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class MenuUtils {
+    public static Plugin plugin = ByteBuildersLobbyPlugin.getPlugin(ByteBuildersLobbyPlugin.class);
+
     public static void openPlotsMenu(Player player, Integer page) {
         Inventory inventory = Bukkit.createInventory(null, 54, MiniMessage.miniMessage().deserialize("<!i><green>My Plots"));
 
@@ -86,55 +89,9 @@ public class MenuUtils {
             for (int i = startIndex; i < clampEnd; i++) {
                 JsonObject plot = plots.get(i).getAsJsonObject();
 
-                int id = plot.get("_id").getAsInt();
-                String name = plot.get("name").getAsString();
-                String description = plot.get("description").getAsString();
-                String sizeName = plot.get("sizeName").getAsString();
-                String material = plot.get("material").getAsString();
-                String skullSkin = plot.get("skullSkin").getAsString();
-                int modelData = plot.get("modelData").getAsInt();
-                boolean whitelisted = plot.get("whitelisted").getAsBoolean();
-                ItemStack item = new ItemStack(Material.valueOf(material.toUpperCase()));
-                ItemMeta itemMeta = item.getItemMeta();
-                if (material.equalsIgnoreCase("PLAYER_HEAD")) {
-                    URL skullSkinUrl;
-                    try {
-                        skullSkinUrl = new URI(skullSkin).toURL();
+                ItemStack item = ItemManager.createPlotItem(plot);
 
-                        SkullMeta skullMeta = (SkullMeta) itemMeta;
-                        PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
-                        PlayerTextures playerTextures = playerProfile.getTextures();
-                        playerTextures.setSkin(skullSkinUrl);
-                        playerProfile.setTextures(playerTextures);
-                        skullMeta.setPlayerProfile(playerProfile);
-                    } catch (Exception e) {
-                        item = new ItemStack(Material.MAP);
-                    }
-                }
-
-                itemMeta.displayName(MiniMessage.miniMessage().deserialize("<!i><white>" + name));
-                List<Component> lore = new ArrayList<>();
-                if (itemMeta.hasLore() && itemMeta.lore() != null) {
-                    lore = itemMeta.lore();
-                }
-
-                assert lore != null;
-                lore.add(MiniMessage.miniMessage().deserialize("<!i><#808080>" + sizeName + " Plot"));
-                lore.add(MiniMessage.miniMessage().deserialize("<!i><white>" + description));
-
-                if (whitelisted) {
-                    lore.add(MiniMessage.miniMessage().deserialize("<!i><red>Whitelisted"));
-                }
-
-                lore.add(MiniMessage.miniMessage().deserialize(""));
-                lore.add(MiniMessage.miniMessage().deserialize("<!i><dark_gray>ID: " + id));
-
-                itemMeta.lore(lore);
-                itemMeta.setCustomModelData(modelData);
-
-                item.setItemMeta(itemMeta);
-
-                player.getOpenInventory().setItem(slot, ItemManager.preventDropAndMove(item));
+                inventory.setItem(slot, ItemManager.preventDropAndMove(item));
 
                 slot++;
             }
@@ -150,7 +107,7 @@ public class MenuUtils {
                 statsItemLore.add(MiniMessage.miniMessage().deserialize("<!i><gray> - " + key + " Plots: <aqua>" + count));
             }
             statsItem.lore(statsItemLore);
-            player.getOpenInventory().setItem(4, ItemManager.preventDropAndMove(statsItem));
+            inventory.setItem(4, ItemManager.preventDropAndMove(statsItem));
 
 
         }).exceptionally(ex -> {
@@ -161,6 +118,42 @@ public class MenuUtils {
         });
     }
 
+    public static void openPlotEditMenu(Player player, Integer id) {
+        Inventory inventory = Bukkit.createInventory(null, 54, MiniMessage.miniMessage().deserialize("<!i><green>Settings for Plot ID: " + id));
+
+        //fill the inventory with border items
+        for (int i = 0; i < inventory.getSize(); i++) {
+            inventory.setItem(i, ItemManager.preventDropAndMove(ItemManager.createPlotMenuBorderItem()));
+        }
+        //fill slots 9 to (size - 9) with air
+        for (int i = 9; i < inventory.getSize() - 9; i++) {
+            inventory.setItem(i, new ItemStack(Material.AIR));
+        }
+        PlotUtils.getPlotObject(id).thenAccept(plot -> {
+            inventory.setItem(4, ItemManager.preventDropAndMove(ItemManager.createPlotItem(plot)));
+        });
+
+        inventory.setItem(19, ItemManager.preventDropAndMove(ItemManager.createDevelopersListItem(id)));
+        inventory.setItem(20, ItemManager.preventDropAndMove(ItemManager.createBuildersListItem(id)));
+        inventory.setItem(22, ItemManager.preventDropAndMove(ItemManager.createJoinPlotItem(id)));
+        inventory.setItem(24, ItemManager.preventDropAndMove(ItemManager.createCoOwnerPlayersListItem(id)));
+        inventory.setItem(25, ItemManager.preventDropAndMove(ItemManager.createEditPlotNameItem(id)));
+
+        inventory.setItem(28, ItemManager.preventDropAndMove(ItemManager.createBannedPlayersListItem(id)));
+        inventory.setItem(29, ItemManager.preventDropAndMove(ItemManager.createWhitelistedPlayersListItem(id)));
+
+        ItemManager.createTogglePlotWhitelistItem(id).thenAccept(item -> {
+            inventory.setItem(33, ItemManager.preventDropAndMove(item));
+        });
+        inventory.setItem(34, ItemManager.preventDropAndMove(ItemManager.createEditPlotDescriptionItem(id)));
+
+        player.openInventory(inventory);
+
+    }
+
+    public static void openJoinPlotMenu(Player player, int id) {
+        Inventory inventory = Bukkit.createInventory(null, 45, MiniMessage.miniMessage().deserialize("<!i><green>Join Plot"));
+    }
     public static void openClaimNewPlotMenu(Player player) {
         Inventory inventory = Bukkit.createInventory(null, 45, MiniMessage.miniMessage().deserialize("<!i><green>Claim New Plot"));
 
@@ -204,7 +197,7 @@ public class MenuUtils {
 
                 int slot = 11 + 2 * index + 12 * Math.floorDiv(index, 3);
 
-                player.getOpenInventory().setItem(slot, ItemManager.preventDropAndMove(item));
+                inventory.setItem(slot, ItemManager.preventDropAndMove(item));
                 index++;
             }
         }).exceptionally(ex -> {
