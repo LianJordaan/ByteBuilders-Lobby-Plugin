@@ -1,5 +1,7 @@
 package io.github.lianjordaan.byteBuildersLobbyPlugin.utils;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.google.gson.JsonObject;
 import io.github.lianjordaan.byteBuildersLobbyPlugin.ByteBuildersLobbyPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -18,9 +20,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.profile.PlayerTextures;
 
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class ItemManager {
     public static Plugin plugin = ByteBuildersLobbyPlugin.getPlugin(ByteBuildersLobbyPlugin.class);
@@ -173,4 +177,177 @@ public class ItemManager {
 
         return item;
     }
+
+    public static ItemStack createDevelopersListItem(Integer plotID) {
+        ItemStack item = new ItemStack(Material.BOOKSHELF); // Use the desired material
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#bb9760>Developers List"));
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "developers-list");
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createBuildersListItem(Integer plotID) {
+        ItemStack item = new ItemStack(Material.BARREL); // Use the desired material
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#705026>Builders List"));
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "builders-list");
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createBannedPlayersListItem(Integer plotID) {
+        ItemStack item = new ItemStack(Material.BARRIER); // Use the desired material
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#ff0000>Banned Players List"));
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "banned-players-list");
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createWhitelistedPlayersListItem(Integer plotID) {
+        ItemStack item = new ItemStack(Material.WRITABLE_BOOK); // Use the desired material
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#a9fcf6>Whitelisted Players List"));
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "whitelisted-players-list");
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createCoOwnerPlayersListItem(Integer plotID) {
+        ItemStack item = new ItemStack(Material.NETHER_STAR); // Use the desired material
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#aa9dfa>Co-Owner List"));
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "co-owner-list");
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createEditPlotNameItem(Integer plotID) {
+        ItemStack item = new ItemStack(Material.OAK_HANGING_SIGN); // Use the desired material
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#e3b049>Edit Plot Name"));
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "edit-plot-name");
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createEditPlotDescriptionItem(Integer plotID) {
+        ItemStack item = new ItemStack(Material.OAK_SIGN); // Use the desired material
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#e3b049>Edit Plot Description"));
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "edit-plot-description");
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static CompletableFuture<ItemStack> createTogglePlotWhitelistItem(Integer plotID) {
+        return PlotUtils.isWhitelisted(plotID).thenApply(isWhitelisted -> {
+            ItemStack isWhiteListedItem = new ItemStack(Material.LEVER);
+            ItemMeta meta = isWhiteListedItem.getItemMeta();
+            meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#E65E8F>Whitelist: <dark_gray>OFF"));
+
+            // Determine the item type based on the whitelist status
+            if (isWhitelisted) {
+                isWhiteListedItem = new ItemStack(Material.REDSTONE_TORCH);
+                meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#E65E8F>Whitelist: <green>ON"));
+            }
+
+            // Set the item meta
+            meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+            meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+            meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "toggle-whitelist");
+            meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+            isWhiteListedItem.setItemMeta(meta);
+
+            return isWhiteListedItem; // Return the constructed ItemStack
+        }).exceptionally(ex -> {
+            Bukkit.getServer().getLogger().info("Error: " + ex);
+            ItemStack item = new ItemStack(Material.LEVER);
+            ItemMeta meta = item.getItemMeta();
+            meta.displayName(MiniMessage.miniMessage().deserialize("<!i><#E65E8F>Whitelist: <dark_gray>OFF"));
+            return new ItemStack(Material.LEVER); // Return a default item on error
+        });
+    }
+    public static ItemStack createJoinPlotItem(Integer plotID) {
+        ItemStack item = new ItemStack(Material.REPEATER);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MiniMessage.miniMessage().deserialize("<!i><red>Join Plot"));
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-move", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("no-drop", plugin), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "join-plot");
+        meta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, plotID);
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createPlotItem(JsonObject plotData){
+        int id = plotData.get("_id").getAsInt();
+        String name = plotData.get("name").getAsString();
+        String description = plotData.get("description").getAsString();
+        String sizeName = plotData.get("sizeName").getAsString();
+        String material = plotData.get("material").getAsString();
+        String skullSkin = plotData.get("skullSkin").getAsString();
+        String ownerUuid = plotData.get("ownerUuid").getAsString();
+        int modelData = plotData.get("modelData").getAsInt();
+        boolean whitelisted = plotData.get("whitelisted").getAsBoolean();
+        ItemStack item = new ItemStack(Material.valueOf(material.toUpperCase()));
+        ItemMeta itemMeta = item.getItemMeta();
+        if (material.equalsIgnoreCase("PLAYER_HEAD")) {
+            URL skullSkinUrl;
+            try {
+                skullSkinUrl = new URI(skullSkin).toURL();
+
+                SkullMeta skullMeta = (SkullMeta) itemMeta;
+                PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
+                PlayerTextures playerTextures = playerProfile.getTextures();
+                playerTextures.setSkin(skullSkinUrl);
+                playerProfile.setTextures(playerTextures);
+                skullMeta.setPlayerProfile(playerProfile);
+            } catch (Exception e) {
+                item = new ItemStack(Material.MAP);
+            }
+        }
+
+        itemMeta.displayName(MiniMessage.miniMessage().deserialize("<!i><white>" + name));
+        List<Component> lore = new ArrayList<>();
+        if (itemMeta.hasLore() && itemMeta.lore() != null) {
+            lore = itemMeta.lore();
+        }
+
+        assert lore != null;
+        lore.add(MiniMessage.miniMessage().deserialize("<!i><#808080>" + sizeName + " Plot"));
+        lore.add(MiniMessage.miniMessage().deserialize("<!i><white>" + description));
+
+        if (whitelisted) {
+            lore.add(MiniMessage.miniMessage().deserialize("<!i><red>Whitelisted"));
+        }
+
+        lore.add(MiniMessage.miniMessage().deserialize(""));
+        lore.add(MiniMessage.miniMessage().deserialize("<!i><dark_gray>ID: " + id));
+
+        itemMeta.lore(lore);
+        itemMeta.setCustomModelData(modelData);
+        itemMeta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-id", plugin), PersistentDataType.INTEGER, id);
+        itemMeta.getPersistentDataContainer().set(NamespacedKey.fromString("plot-owner", plugin), PersistentDataType.STRING, ownerUuid);
+        itemMeta.getPersistentDataContainer().set(NamespacedKey.fromString("open-menu", plugin), PersistentDataType.STRING, "manage-join-plot");
+
+        item.setItemMeta(itemMeta);
+
+        return item;
+    }
+
 }
